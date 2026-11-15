@@ -1,0 +1,10 @@
+{
+  "id": "home_maintenance",
+  "name": "Home Maintenance",
+  "route": "/maintenance",
+  "icon": "list-checks",
+  "description": "The jobs around the house, and when they're next due.",
+  "accent": "#6E8A79",
+  "order": 2,
+  "enabled": true
+}
