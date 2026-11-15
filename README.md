@@ -40,13 +40,12 @@ applications/home-maintenance-module/
   static/home_maintenance.js
 ```
 
-The hub discovers any folder with an `app.py` and mounts it automatically.
-This module's Blueprint is `home_maintenance`, so without a registry entry its
-route is `/home-maintenance-module` and its card is named after the folder,
-"Home Maintenance Module".
+The hub discovers any folder with an `app.py` and mounts it automatically. It
+drops the packaging suffix when naming a module, so this folder appears on the
+homepage as **Home Maintenance** and lives at `/home-maintenance-module`.
 
-For the name, route and colour used in the Thompson hub, add the matching entry
-to `config/apps.json`:
+To use the shorter `/maintenance` route with the checklist icon and sage
+accent, add the matching entry to `config/apps.json`:
 
 ```json
 {
@@ -61,7 +60,8 @@ to `config/apps.json`:
 }
 ```
 
-That entry is what gives the homepage card the name **Home Maintenance**.
+A registry entry also sets the card's name if you install this on an older hub
+that still displays folder names literally.
 
 ## Data
 
@@ -93,6 +93,6 @@ All tables live in the hub's central SQLite database:
 python -m compileall -q applications/home-maintenance-module
 ```
 
-Then open `/maintenance` in the hub: add a group, add a task with no group, add
-a recurring task, mark each complete, and check the grey countdown and the
+Then open the module in the hub: add a group, add a task with no group, add a
+recurring task, mark each complete, and check the grey countdown and the
 overdue state (a task due more than a week ago).
