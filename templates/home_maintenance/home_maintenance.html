@@ -45,7 +45,7 @@
 </li>
 {%- endmacro %}
 
-{% block title %}{{ current_application.name }} Â· Thompson{% endblock %}
+{% block title %}{{ current_application.name }} &middot; Thompson{% endblock %}
 {% block body_class %}app-body maintenance-body{% endblock %}
 
 {% block head %}
@@ -69,7 +69,7 @@
         <p class="eyebrow">Around the house</p>
         <h1>{{ current_application.name }}</h1>
         <p class="mnt-hero__sub">
-          The jobs worth remembering â€” grouped how you like, and timed to come
+          The jobs worth remembering &mdash; grouped how you like, and timed to come
           back around.
         </p>
       </div>
@@ -223,7 +223,7 @@
 
         <section class="panel mnt-panel" aria-labelledby="mnt-add-group">
           <h2 id="mnt-add-group">Add a group</h2>
-          <p class="mnt-panel__hint">Optional â€” group jobs by room or type.</p>
+          <p class="mnt-panel__hint">Optional &mdash; group jobs by room or type.</p>
 
           {% if group_error %}
             <p class="form-error" role="alert">{{ group_error }}</p>
