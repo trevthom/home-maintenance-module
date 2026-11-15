@@ -78,7 +78,7 @@ def list_groups() -> list[dict]:
     rows = get_db().execute(
         """
         SELECT id, name FROM maintenance_groups
-        ORDER BY position ASC, name COLLATE NOCASE ASC, id ASC
+        ORDER BY name COLLATE NOCASE ASC, id ASC
         """
     ).fetchall()
     return [{"id": int(row["id"]), "name": row["name"]} for row in rows]
@@ -109,7 +109,7 @@ def create_group(name: str) -> tuple[int | None, str | None]:
 
 
 def delete_group(group_id: int) -> bool:
-    """Delete a group; its tasks stay and become standalone tasks."""
+    """Delete a group; its tasks stay and move to the one-time task list."""
 
     db = get_db()
     if not db.execute(
