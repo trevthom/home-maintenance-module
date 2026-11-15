@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% from "_chrome.html" import hub_back %}
+{% from "_icons.html" import icon %}
+
+{% macro task_row(task) -%}
+<li class="mnt-task mnt-task--{{ task.status }}">
+  {% if task.completed %}
+    <form class="mnt-task__toggle" method="post"
+          action="{{ url_for('home_maintenance.task_reopen', task_id=task.id) }}">
+      <button class="mnt-check mnt-check--done" type="submit"
+              title="Mark as not done" aria-label="Mark {{ task.title }} as not done">
+        {{ icon('check') }}
+      </button>
+    </form>
+  {% else %}
+    <form class="mnt-task__toggle" method="post"
+          action="{{ url_for('home_maintenance.task_complete', task_id=task.id) }}">
+      <button class="mnt-check" type="submit"
+              title="Mark complete" aria-label="Mark {{ task.title }} complete">
+        <span class="mnt-check__dot" aria-hidden="true"></span>
+      </button>
+    </form>
+  {% endif %}
+
+  <div class="mnt-task__text">
+    <p class="mnt-task__title">
+      <span class="mnt-task__name">{{ task.title }}</span>
+      {% if task.countdown %}<span class="mnt-countdown">{{ task.countdown }}</span>{% endif %}
+      {% if task.status == 'overdue' %}
+        <span class="mnt-badge">{{ icon('alert') }}Overdue</span>
+      {% endif %}
+    </p>
+    <p class="mnt-task__meta">
+      <span class="mnt-repeat">{{ task.recurrence_label }}</span>
+      <span class="mnt-due">{{ task.due_label }}</span>
+    </p>
+  </div>
+
+  <form class="mnt-task__delete" method="post"
+        action="{{ url_for('home_maintenance.task_delete', task_id=task.id) }}"
+        data-confirm="Delete {{ task.title }}?">
+    <button class="mnt-icon-btn" type="submit" title="Delete task"
+            aria-label="Delete {{ task.title }}">{{ icon('trash') }}</button>
+  </form>
+</li>
+{%- endmacro %}
+
+{% block title %}{{ current_application.name }} Â· Thompson{% endblock %}
+{% block body_class %}app-body maintenance-body{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet"
+        href="{{ url_for('home_maintenance.static', filename='home_maintenance.css', v='1') }}">
+{% endblock %}
+
+{% block content %}
+<div class="mnt-app" style="--app-accent: {{ current_application.accent }}">
+  <header class="mnt-topbar">
+    {{ hub_back() }}
+    <div class="mnt-brand">
+      <span class="mnt-brand__mark" aria-hidden="true">{{ icon('list-checks') }}</span>
+      <span class="mnt-brand__name">{{ current_application.name }}</span>
+    </div>
+  </header>
+
+  <main class="mnt-main">
+    <header class="mnt-hero">
+      <div>
+        <p class="eyebrow">Around the house</p>
+        <h1>{{ current_application.name }}</h1>
+        <p class="mnt-hero__sub">
+          The jobs worth remembering â€” grouped how you like, and timed to come
+          back around.
+        </p>
+      </div>
+      {% if board.total %}
+        <p class="mnt-hero__count">
+          <strong>{{ board.total }}</strong> {{ 'task' if board.total == 1 else 'tasks' }}
+          {% if board.overdue %}
+            <span class="mnt-hero__overdue">{{ board.overdue }} overdue</span>
+          {% endif %}
+        </p>
+      {% endif %}
+    </header>
+
+    <div class="mnt-columns">
+      <div class="mnt-board">
+        {% if not board.total and not board.groups %}
+          <section class="panel mnt-empty-state">
+            <span class="mnt-empty-state__icon">{{ icon('list-checks') }}</span>
+            <h2>Nothing to maintain yet</h2>
+            <p>
+              Add the first job. Make it one-time or something that comes back
+              around, and group it if you want.
+            </p>
+          </section>
+        {% endif %}
+
+        {% for group in board.groups %}
+          <section class="mnt-group" aria-labelledby="mnt-group-{{ group.id }}">
+            <header class="mnt-group__head">
+              <div class="mnt-group__title">
+                <h2 id="mnt-group-{{ group.id }}">{{ group.name }}</h2>
+                <span class="mnt-group__count">
+                  {{ group.tasks | length }} {{ 'task' if group.tasks | length == 1 else 'tasks' }}
+                </span>
+              </div>
+              <form method="post"
+                    action="{{ url_for('home_maintenance.group_delete', group_id=group.id) }}"
+                    data-confirm="Delete the group {{ group.name }}? Its tasks stay as standalone tasks.">
+                <button class="mnt-icon-btn" type="submit" title="Delete group"
+                        aria-label="Delete the group {{ group.name }}">{{ icon('trash') }}</button>
+              </form>
+            </header>
+
+            {% if group.tasks %}
+              <ul class="mnt-list">
+                {% for task in group.tasks %}{{ task_row(task) }}{% endfor %}
+              </ul>
+            {% else %}
+              <p class="mnt-group__empty">No tasks in this group yet.</p>
+            {% endif %}
+          </section>
+        {% endfor %}
+
+        {% if board.standalone %}
+          <section class="mnt-group" aria-labelledby="mnt-standalone">
+            <header class="mnt-group__head">
+              <div class="mnt-group__title">
+                <h2 id="mnt-standalone">Standalone tasks</h2>
+                <span class="mnt-group__count">
+                  {{ board.standalone | length }}
+                  {{ 'task' if board.standalone | length == 1 else 'tasks' }}
+                </span>
+              </div>
+            </header>
+            <ul class="mnt-list">
+              {% for task in board.standalone %}{{ task_row(task) }}{% endfor %}
+            </ul>
+          </section>
+        {% endif %}
+      </div>
+
+      <aside class="mnt-side">
+        <section class="panel mnt-panel" aria-labelledby="mnt-add-task">
+          <h2 id="mnt-add-task">Add a task</h2>
+
+          {% if error %}
+            <p class="form-error" role="alert">{{ error }}</p>
+          {% endif %}
+
+          <form class="form-stack" method="post"
+                action="{{ url_for('home_maintenance.task_create') }}">
+            <label class="field">
+              <span>Task</span>
+              <input name="title" maxlength="120" required autocomplete="off"
+                     placeholder="e.g. Clean the gutters" value="{{ values.title }}">
+            </label>
+
+            <div class="field">
+              <span id="mnt-repeat-label">How often?</span>
+              <div class="mnt-choice" role="group" aria-labelledby="mnt-repeat-label">
+                <label class="mnt-choice__option">
+                  <input type="radio" name="repeat" value="once"
+                         {% if values.repeat != 'recurring' %}checked{% endif %}>
+                  <span>One-time</span>
+                </label>
+                <label class="mnt-choice__option">
+                  <input type="radio" name="repeat" value="recurring"
+                         {% if values.repeat == 'recurring' %}checked{% endif %}>
+                  <span>Recurring</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field-row" data-repeat-row>
+              <label class="field">
+                <span>Repeat every</span>
+                <input type="number" name="interval_count" min="1" max="365"
+                       step="1" inputmode="numeric" value="{{ values.interval_count }}">
+              </label>
+              <label class="field">
+                <span>Period</span>
+                <select name="interval_unit">
+                  {% for unit in repeat_units %}
+                    <option value="{{ unit }}"
+                            {% if values.interval_unit == unit %}selected{% endif %}>
+                      {{ unit | capitalize }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Group <em>optional</em></span>
+              <select name="group_id">
+                <option value="">Standalone task</option>
+                {% for group in board.groups %}
+                  <option value="{{ group.id }}"
+                          {% if values.group_id == (group.id | string) %}selected{% endif %}>
+                    {{ group.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Next due <em>optional</em></span>
+              <input type="date" name="due_on" value="{{ values.due_on }}">
+            </label>
+
+            <p class="field-hint">
+              Recurring tasks are due now, then come back on their own schedule
+              after you mark them complete.
+            </p>
+
+            <button class="button button--primary button--wide" type="submit">
+              Add task
+            </button>
+          </form>
+        </section>
+
+        <section class="panel mnt-panel" aria-labelledby="mnt-add-group">
+          <h2 id="mnt-add-group">Add a group</h2>
+          <p class="mnt-panel__hint">Optional â€” group jobs by room or type.</p>
+
+          {% if group_error %}
+            <p class="form-error" role="alert">{{ group_error }}</p>
+          {% endif %}
+
+          <form class="form-stack" method="post"
+                action="{{ url_for('home_maintenance.group_create') }}">
+            <label class="field">
+              <span>Group name</span>
+              <input name="name" maxlength="60" required autocomplete="off"
+                     placeholder="e.g. Outside">
+            </label>
+            <button class="button button--secondary button--wide" type="submit">
+              Add group
+            </button>
+          </form>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('home_maintenance.static', filename='home_maintenance.js', v='1') }}"
+          defer></script>
+{% endblock %}
