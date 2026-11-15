@@ -95,7 +95,7 @@ def create_group(name: str) -> tuple[int | None, str | None]:
         (cleaned,),
     ).fetchone()
     if existing:
-        return None, f'There is already a group called â€œ{cleaned}â€.'
+        return None, f'There is already a group called "{cleaned}".'
 
     next_position = db.execute(
         "SELECT COALESCE(MAX(position), -1) + 1 AS next FROM maintenance_groups"
@@ -215,9 +215,9 @@ def validate_task(data) -> tuple[dict, str | None]:
         try:
             count = int(values["interval_count"])
         except (TypeError, ValueError):
-            return values, "â€œRepeat everyâ€ needs a whole number."
+            return values, '"Repeat every" needs a whole number.'
         if not 1 <= count <= MAX_INTERVAL:
-            return values, f"â€œRepeat everyâ€ must be between 1 and {MAX_INTERVAL}."
+            return values, f'"Repeat every" must be between 1 and {MAX_INTERVAL}.'
         values["interval_count"] = str(count)
 
     return values, None
