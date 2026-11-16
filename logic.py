@@ -167,6 +167,7 @@ def blank_task_values() -> dict[str, str]:
         "interval_count": "1",
         "interval_unit": "months",
         "group_id": "",
+        "due_enabled": "",
         "due_on": date.today().isoformat(),
     }
 
@@ -184,13 +185,18 @@ def validate_task(data) -> tuple[dict, str | None]:
         "interval_count": clean_text(data.get("interval_count"), 8) or "1",
         "interval_unit": clean_text(data.get("interval_unit"), 12) or "months",
         "group_id": clean_text(data.get("group_id"), 20),
+        "due_enabled": (
+            "yes" if clean_text(data.get("due_enabled"), 10) == "yes" else ""
+        ),
         "due_on": clean_text(data.get("due_on"), 10),
     }
 
     if not values["title"]:
         return values, "Give the task a name."
 
-    if values["due_on"]:
+    # The date field only counts when its checkbox is ticked; otherwise the
+    # task is simply due today and any submitted date is ignored.
+    if values["due_enabled"] and values["due_on"]:
         try:
             date.fromisoformat(values["due_on"])
         except ValueError:
