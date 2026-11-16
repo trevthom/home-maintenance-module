@@ -151,14 +151,14 @@
               </select>
             </label>
 
-            <div class="mnt-due">
-              <input class="mnt-due__toggle" type="checkbox" id="mnt-due-toggle"
+            <div class="mnt-due-pick">
+              <input class="mnt-due-pick__toggle" type="checkbox" id="mnt-due-toggle"
                      name="due_enabled" value="yes"
                      {% if values.due_enabled %}checked{% endif %}>
-              <label class="mnt-due__label" for="mnt-due-toggle">
+              <label class="mnt-due-pick__label" for="mnt-due-toggle">
                 Set a next due date <em>optional</em>
               </label>
-              <div class="field-row mnt-due__field" data-due-row>
+              <div class="field-row mnt-due-pick__field" data-due-row>
                 <label class="field">
                   <span>Next due</span>
                   <input type="date" name="due_on" value="{{ values.due_on }}">
