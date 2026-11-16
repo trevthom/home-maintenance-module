@@ -75,7 +75,9 @@ All tables live in the hub's central SQLite database:
 
 ## Behaviour notes
 
-- A new task is due on the date chosen, or today when none is given.
+- A new task is due today unless you tick **Set a next due date** and pick
+  one. The date field only appears once the checkbox is ticked, and a date
+  submitted without the tick is ignored.
 - Completing a recurring task early advances from its original due date;
   completing it on time or late advances from today. Completing a weekly task
   on its due date puts it `in 7 days`.

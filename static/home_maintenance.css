@@ -481,6 +481,48 @@
   accent-color: color-mix(in srgb, var(--app-accent, var(--accent)) 80%, var(--ink));
 }
 
+/* Next due is opt-in: the date only appears once the checkbox is ticked. */
+
+.mnt-due {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 9px;
+}
+
+.mnt-due__toggle {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: color-mix(in srgb, var(--app-accent, var(--accent)) 80%, var(--ink));
+}
+
+.mnt-due__label {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mnt-due__label em {
+  margin-left: 3px;
+  color: var(--muted);
+  font-size: 9.5px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mnt-due__field {
+  display: none;
+  grid-column: 1 / -1;
+}
+
+.mnt-due__toggle:checked ~ .mnt-due__field {
+  display: grid;
+}
+
 /* Empty state ------------------------------------------------------------ */
 
 .mnt-empty-state {
