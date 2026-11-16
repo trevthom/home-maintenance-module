@@ -50,7 +50,7 @@
 
 {% block head %}
   <link rel="stylesheet"
-        href="{{ url_for('home_maintenance.static', filename='home_maintenance.css', v='2') }}">
+        href="{{ url_for('home_maintenance.static', filename='home_maintenance.css', v='3') }}">
 {% endblock %}
 
 {% block content %}
@@ -151,10 +151,20 @@
               </select>
             </label>
 
-            <label class="field">
-              <span>Next due <em>optional</em></span>
-              <input type="date" name="due_on" value="{{ values.due_on }}">
-            </label>
+            <div class="mnt-due">
+              <input class="mnt-due__toggle" type="checkbox" id="mnt-due-toggle"
+                     name="due_enabled" value="yes"
+                     {% if values.due_enabled %}checked{% endif %}>
+              <label class="mnt-due__label" for="mnt-due-toggle">
+                Set a next due date <em>optional</em>
+              </label>
+              <div class="field-row mnt-due__field" data-due-row>
+                <label class="field">
+                  <span>Next due</span>
+                  <input type="date" name="due_on" value="{{ values.due_on }}">
+                </label>
+              </div>
+            </div>
 
             <p class="field-hint">
               Recurring tasks are due now, then come back on their own schedule
@@ -257,6 +267,6 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{{ url_for('home_maintenance.static', filename='home_maintenance.js', v='2') }}"
+  <script src="{{ url_for('home_maintenance.static', filename='home_maintenance.js', v='3') }}"
           defer></script>
 {% endblock %}
